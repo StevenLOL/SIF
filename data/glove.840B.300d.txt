@@ -1,0 +1,1 @@
+/data1/ML_DATA/NLP/w2v/glove.6B.300d.txt

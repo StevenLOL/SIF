@@ -3,13 +3,14 @@ import numpy as np
 import pickle
 from tree import tree
 from theano import config
-
+import time
 
 def getWordmap(textfile):
-    words={}
+    words={} #word2index
     We = []
     f = open(textfile,'r')
     lines = f.readlines()
+    t1=time.time()
     for (n,i) in enumerate(lines):
         i=i.split()
         j = 1
@@ -17,8 +18,12 @@ def getWordmap(textfile):
         while j < len(i):
             v.append(float(i[j]))
             j += 1
+
         words[i[0]]=n
         We.append(v)
+        if n%50000==0:
+            print (i[0],n,len(v),time.time()-t1)
+            t1=time.time()
     return (words, np.array(We))
 
 def prepare_data(list_of_seqs):
@@ -266,6 +271,7 @@ def entailment2idx(sim_file, words):
     return x1, m1, x2, m2, golds
 
 def getWordWeight(weightfile, a=1e-3):
+    print ('a=%f'%(a))
     if a <=0: # when the parameter makes no sense, use unweighted
         a = 1.0
 
@@ -293,6 +299,7 @@ def getWeight(words, word2weight):
             weight4ind[ind] = word2weight[word]
         else:
             weight4ind[ind] = 1.0
+        #print (word,ind,weight4ind[ind])
     return weight4ind
 
 def seq2weight(seq, mask, weight4ind):
@@ -323,7 +330,8 @@ def getIDFWeight(wordfile, save_file=''):
         return x1,m1,x2,m2
 
     prefix = "../data/"
-    farr = ["MSRpar2012",
+    farr = ["MSRpar2012",]
+    '''
             "MSRvid2012",
             "OnWN2012",
             "SMTeuro2012",
@@ -348,11 +356,13 @@ def getIDFWeight(wordfile, save_file=''):
             "JHUppdb",
             "anno-dev",
             "anno-test"]
+    '''
     (words, We) = getWordmap(wordfile)
     df = np.zeros((len(words),))
     dlen = 0
     for f in farr:
         g1x,g1mask,g2x,g2mask = getDataFromFile(prefix+f, words)
+        print ('g1x.shape',g1x.shape,g2x.shape)
         dlen += g1x.shape[0]
         dlen += g2x.shape[0]
         for i in xrange(g1x.shape[0]):
@@ -366,7 +376,10 @@ def getIDFWeight(wordfile, save_file=''):
 
     weight4ind = {}
     for i in xrange(len(df)):
+
         weight4ind[i] = np.log2((dlen+2.0)/(1.0+df[i]))
+        if (i % 10000)==1:
+            print (i,dlen,df[i],weight4ind[i])
     if save_file:
         pickle.dump(weight4ind, open(save_file, 'w'))
     return weight4ind

@@ -27,6 +27,9 @@ def sim_getCorrelation(We,words,f, weight4ind, scoring_function, params):
     m1 = data_io.seq2weight(x1, m1, weight4ind)
     m2 = data_io.seq2weight(x2, m2, weight4ind)
     scores = scoring_function(We,x1,x2,m1,m2, params)
+    print seq1[0]
+    print seq2[0]
+    print scores[0]
     preds = np.squeeze(scores)
     return pearsonr(preds,golds)[0], spearmanr(preds,golds)[0]
 
@@ -34,7 +37,8 @@ def sim_evaluate_all(We, words, weight4ind, scoring_function, params):
     prefix = "../data/"
     parr = []; sarr = []
 
-    farr = ["MSRpar2012",
+    farr = ["MSRpar2012",]
+    '''
             "MSRvid2012",
             "OnWN2012",
             "SMTeuro2012",
@@ -59,7 +63,7 @@ def sim_evaluate_all(We, words, weight4ind, scoring_function, params):
             "JHUppdb",
             "anno-dev",
             "anno-test"]
-
+    '''
     for i in farr:
         p,s = sim_getCorrelation(We, words, prefix+i, weight4ind, scoring_function, params)
         parr.append(p); sarr.append(s)

@@ -1,5 +1,5 @@
 import pickle, sys
-sys.path.append('../src')
+
 import data_io, sim_algo, eval, params
 
 ## run
@@ -8,8 +8,8 @@ wordfiles = [#'../data/paragram_sl999_small.txt', # need to download it from Joh
     ]
 
 weightfile = '../auxiliary_data/enwiki_vocab_min200.txt'
-weightparas = [-1, 1e-3]#[-1,1e-1,1e-2,1e-3,1e-4]
-rmpcs = [0,1]# [0,1,2]
+weightparas = [1,-1,0.9,0.8,0.7,0.6,0.5,0.4,0.3,0.2,0.1,0.01, 1e-3]#[-1,1e-1,1e-2,1e-3,1e-4]
+rmpcs = [0]# [0,1,2]
 
 params = params.params()
 parr4para = {}
@@ -23,9 +23,9 @@ for wordfile in wordfiles:
             print 'word vectors loaded from %s' % wordfile
             print 'word weights computed from %s using parameter a=%f' % (weightfile, weightpara)
             params.rmpc = rmpc
-            print 'remove the first %d principal components' % rmpc
+            print 'remove the first %d principal components, weightpara=%f' % (rmpc,weightpara)
             ## eval just one example dataset
-            parr, sarr = eval.sim_evaluate_all(We, words, weight4ind, sim_algo.weighted_average_sim_rmpc, params)
+            parr, sarr = eval.sim_evaluate_one(We, words, weight4ind, sim_algo.weighted_average_sim_rmpc, params)
             ## eval all datasets; need to obtained datasets from John Wieting's github (https://github.com/jwieting/iclr2016)
             # parr, sarr = eval.sim_evaluate_all(We, words, weight4ind, sim_algo.weighted_average_sim_rmpc, params)
             paras = (wordfile, weightfile, weightpara, rmpc)
